@@ -11,7 +11,8 @@ def PyFRExceptionLogger(exception):
                                          userInfo[u'__pyobjc_exc_traceback__'] )
 
     for line in excStr:
-        Foundation.NSLog( line.decode('utf8') )
+        for l in line.split('\n'):
+            Foundation.NSLog( l.decode('utf8') )
 
 
     # we logged it, so don't log it for us

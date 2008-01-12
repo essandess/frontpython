@@ -20,6 +20,6 @@ plist = dict(NSPrincipalClass='RUIPythonAppliance',
 
 setup(
     plugin = ['FrontPython.py'],
-    data_files=['English.lproj'],
+    data_files=['English.lproj', 'PyFR'],
     options=dict(py2app=dict(extension='.frappliance', plist=plist))
  )

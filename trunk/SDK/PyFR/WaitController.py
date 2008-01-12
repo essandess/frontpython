@@ -14,7 +14,7 @@ class WaitController(BRController, ControllerUtilities):
         ''' Set up the text field '''
         attribs = BRThemeInfo.sharedTheme().paragraphTextAttributes()
         self.textController = BRHeaderControl.alloc().init()
-        self.textController.setTitle_( u"Loading MythFrontend" )
+        self.textController.setTitle_( text )
 
         # There's probably a better way to do this,
         masterFrame = BRRenderScene.singleton().size()

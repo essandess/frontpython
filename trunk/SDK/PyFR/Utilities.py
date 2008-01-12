@@ -18,10 +18,10 @@ class ControllerUtilities:
 
         self.log('*'*80)
 
-        # Check to see if Myth is running.
+        # Check to see if App is running.
         found = False
         for app in Foundation.NSWorkspace.sharedWorkspace().launchedApplications():
-            if app['NSApplicationName'] == "MythFrontend":
+            if app['NSApplicationName'] == self.lookForApp:
 
                 # Is it the active app?
                 ws = Foundation.NSWorkspace.sharedWorkspace()
@@ -37,7 +37,7 @@ class ControllerUtilities:
 
                 return
 
-        # If we don't find Myth running, then we exited. So bring FR back.
+        # If we don't find App running, then we exited. So bring FR back.
         if not found:
             frController = BRAppManager.sharedApplication().delegate()
             frController._showFrontRow()
@@ -55,13 +55,13 @@ class ControllerUtilities:
 
         self.launchedApp = appToLaunch
 
-        # Load Myth
+        # Load App
         ws = Foundation.NSWorkspace.sharedWorkspace()
         ws.launchApplication_( self.launchedApp )
 
         self.lookForApp = self.launchedApp.split('/')[-1][:-4]
 
-        # wait for Myth to launch
+        # wait for App to launch
         found = False
         while not found:
             # I probably shouldn't use a sleep here, as thats not good GUI 
@@ -69,7 +69,7 @@ class ControllerUtilities:
             # here.
             time.sleep(.5)
 
-            # check the list of launched app to see if Myth has finished loading.
+            # check the list of launched app to see if App has finished loading.
             for app in Foundation.NSWorkspace.sharedWorkspace().launchedApplications():
 
                 if app['NSApplicationName'] == self.lookForApp:

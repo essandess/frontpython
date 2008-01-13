@@ -1,0 +1,12 @@
+#Intro
+
+= Introduction =
+
+This is an SDK for creating plugins for Front Row 2.0 on Leopard, using [http://www.python.org Python]. Currently, this will not work with AppleTV, or Front Row that came with Tiger.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages

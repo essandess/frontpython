@@ -14,18 +14,27 @@ class ControllerUtilities:
     def log(self, s):
         Foundation.NSLog( "%s: %s" % (self.__class__.__name__, str(s) ) )
 
-    def launchedAppTick_(self, senders):
 
-        self.log('*'*80)
+    # subclass can replace this with an additional exit condition test.  If this fn returns true
+    # we return to FrontRow
+    def AppShouldExit(self):
+        return False
 
+    def AboutToHideFR(self):
+        return False
+
+    def AboutToShowFR(self):
+        return False
+
+
+    def IsRunning(self, ping=False):
         # Check to see if App is running.
-        found = False
         for app in Foundation.NSWorkspace.sharedWorkspace().launchedApplications():
             if app['NSApplicationName'] == self.lookForApp:
-
+                
                 # Is it the active app?
                 ws = Foundation.NSWorkspace.sharedWorkspace()
-
+                
                 activeApp = ws.activeApplication()
                 if activeApp['NSApplicationName'] != self.lookForApp:
 
@@ -33,12 +42,22 @@ class ControllerUtilities:
                     # Why do we do this you ask? Well.. When we hide front row
                     # above, it brings the last active application to the front.
                     # Why? I don't know.
-                    ws.launchApplication_( self.launchedApp )
 
-                return
+                    if (ping):
+                        ws.launchApplication_( self.launchedApp )
+
+                return True
+
+        return False
+
+    def launchedAppTick_(self, senders):
+
+        self.log('*'*80)
+
+        found=self.IsRunning(True)
 
         # If we don't find App running, then we exited. So bring FR back.
-        if not found:
+        if not found or self.AppShouldExit():
             frController = BRAppManager.sharedApplication().delegate()
             frController._showFrontRow()
 
@@ -54,29 +73,19 @@ class ControllerUtilities:
         """
 
         self.launchedApp = appToLaunch
-
-        # Load App
-        ws = Foundation.NSWorkspace.sharedWorkspace()
-        ws.launchApplication_( self.launchedApp )
-
         self.lookForApp = self.launchedApp.split('/')[-1][:-4]
 
-        # wait for App to launch
-        found = False
-        while not found:
+        # possibly Load App
+        while not self.IsRunning():
+            ws = Foundation.NSWorkspace.sharedWorkspace()
+            ws.launchApplication_( self.launchedApp )
+
             # I probably shouldn't use a sleep here, as thats not good GUI 
             # practice. But it works. Not like its going to be around long in 
             # here.
-            time.sleep(.5)
+            time.sleep(0.5)
 
-            # check the list of launched app to see if App has finished loading.
-            for app in Foundation.NSWorkspace.sharedWorkspace().launchedApplications():
-
-                if app['NSApplicationName'] == self.lookForApp:
-                    found = True
-                    break
-            if found:
-                break
+        self.AboutToHideFR()
 
         # Get FR out of the way. Boy was this fun trying to figure out.
         frController = BRAppManager.sharedApplication().delegate()

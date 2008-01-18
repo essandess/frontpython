@@ -23,7 +23,7 @@ class ControllerUtilities:
     def AboutToHideFR(self):
         return False
 
-    def AboutToShowFR(self):
+    def FRWasShown(self):
         return False
 
 
@@ -52,7 +52,7 @@ class ControllerUtilities:
 
     def launchedAppTick_(self, senders):
 
-        self.log('*'*80)
+        #self.log('*'*80)
 
         found=self.IsRunning(True)
 
@@ -63,6 +63,8 @@ class ControllerUtilities:
 
             # Make sure to turn off the timer!
             self.timer.invalidate()
+
+            self.FRWasShown()
 
     def launchApp(self, appToLaunch):
         """ launches the application specified by appToLaunch.

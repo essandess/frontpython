@@ -3,6 +3,7 @@ import time
 import objc
 import Foundation
 import AppKit
+from ScriptingBridge import *
 
 from BackRow import *
 
@@ -46,13 +47,18 @@ class ControllerUtilities:
                     if (ping):
                         ws.launchApplication_( self.launchedApp )
 
+                        # I'm attempting to delay the file opening as
+                        # late as possible, since FR likes to cover everything.
+                        if not self.fileOpened and self.fileToLoad is not None:
+                            self.fileOpened = True
+                            app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
+                            app.open_( self.fileToLoad )
+
                 return True
 
         return False
 
     def launchedAppTick_(self, senders):
-
-        #self.log('*'*80)
 
         found=self.IsRunning(True)
 
@@ -66,35 +72,39 @@ class ControllerUtilities:
 
             self.FRWasShown()
 
-    def launchApp(self, appToLaunch):
-        """ launches the application specified by appToLaunch.
 
+    def launchApp(self, appToLaunch, fileToLoad=None):
+        """ launches the application specified by appToLaunch.
+    
             appToLaunch is a full path to an application. For example,
             to launch Sarafi, it would be:
                 "/Applications/Safari.app"
         """
-
+    
         self.launchedApp = appToLaunch
+        self.fileToLoad = fileToLoad
         self.lookForApp = self.launchedApp.split('/')[-1][:-4]
-
+    
         # possibly Load App
         while not self.IsRunning():
             ws = Foundation.NSWorkspace.sharedWorkspace()
             ws.launchApplication_( self.launchedApp )
-
+    
             # I probably shouldn't use a sleep here, as thats not good GUI 
             # practice. But it works. Not like its going to be around long in 
             # here.
             time.sleep(0.5)
-
+    
         self.AboutToHideFR()
-
+    
         # Get FR out of the way. Boy was this fun trying to figure out.
         frController = BRAppManager.sharedApplication().delegate()
-        frController._hideFrontRow()
+        self.fileOpened = False
 
+        frController._hideFrontRow()
+    
         # Start a timer
-        self.log(self.launchedAppTick_)
         self.timer = Foundation.NSTimer.scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_( 0.25, self, "launchedAppTick:", None, True )
+
 
 

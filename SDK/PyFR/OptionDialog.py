@@ -10,20 +10,30 @@ import AppKit
 
 from BackRow import *
 
+class OptionItem(object):
+    def __init__(self, text, userdata):
+        self.text = text
+        self.data = userdata
+
 class OptionDialog(BROptionDialog):
-    def initWithTitle_Items_Handler_UserData_(self,title,items,handler,userdata):
+    def initWithTitle_Items_Handler_(self, title, items):
         BROptionDialog.init(self)
+        self.items = items
         self.setTitle_(title)
-        for i in items:
-            self.addOptionText_(i)
+        for i in self.items:
+            self.addOptionText_(i.text)
         self.setActionSelector_target_("response:", self)
-        self.handler=handler
-        self.userdata=userdata
         return self
 
     def response_(self):
-        if self.handler(self,self.selectedIndex(),self.userdata):
+        if self.handler(self.selectedIndex(), self.items[ self.selectedIndex() ]):
             self.stack().popController()
+
+    def handler(self, index, item):
+        # this should be overridden in the users class
+        alert = BRAlertController.alertOfType_titled_primaryText_secondaryText_( 0, "Option response:", "Option #%s" % str(index), "Userdata: %s" % item.data)
+        self.stack().pushController_(alert)
+
 
 # 
 # example of using a OptionDialog:  
@@ -43,3 +53,10 @@ def testOptionDialogHandler(controller,idx,userdata):
 def testOptionDialogTest(controller,arg):
     dlg=OptionDialog.alloc().initWithTitle_Items_Handler_UserData_("Test options",["Select a1","Select b","Select c"],testOptionDialogHandler,["a","b","c"])
     return controller.stack().pushController_(dlg)
+
+def testFromMain():
+    menuItems = [ OptionItem( "select %d" % i, i+50 ) for i in range(0,3) ]
+
+    return OptionDialog.alloc().initWithTitle_Items_Handler_( "Test options",
+                                                              menuItems )
+

@@ -13,7 +13,7 @@ def PyFRExceptionLogger(exception):
 
     for line in excStr:
         for l in line.split('\n'):
-            Foundation.NSLog( l.decode('utf8') )
+            Foundation.NSLog( l )
 
 
     # we logged it, so don't log it for us

@@ -7,9 +7,8 @@ from Utilities import ControllerUtilities
 
 # in individual menu item with text, a function to be called when activated, and an optionional argument to be passed to the function
 class MenuItem(ControllerUtilities):
-      def __init__(self,title,func,arg=None,metadata_func=None,subtitle=""):
+      def __init__(self,title,func,arg=None,metadata_func=None):
             self.title=title
-            self.subtitle=subtitle
             self.func=func
             self.arg=arg
             self.metadata_func=metadata_func
@@ -27,13 +26,15 @@ class MenuItem(ControllerUtilities):
             
 # simple container class for a menu, elements of the items list may contain menu items or another Menu instance for submenus
 class Menu:
-      def __init__(self,page_title,items=[],subtitle=""):
+      def __init__(self,page_title,items=[]):
           self.page_title=page_title
           self.items=items
-          self.subtitle=subtitle
           
       def AddItem(self,item):
           self.items.append(item)
+
+      def GetRightText(self):
+            return ""
 
 # used to duck-type Menus (to indicate an item is a submenu)
 def IsMenu(a):
@@ -68,7 +69,7 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
             if IsMenu(self.menu.items[row]):
                   result=BRTextMenuItemLayer.folderMenuItem()
                   result.setTitle_(self.menu.items[row].page_title)
-                  result.setRightJustifiedText_(str(len(self.menu.items[row].items)))
+                  result.setRightJustifiedText_(self.menu.items[row].GetRightText())
             else:
                   result=BRTextMenuItemLayer.menuItem()
                   result.setTitle_(self.menu.items[row].title)
@@ -110,6 +111,10 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
 
 
 class MenuController(BRMediaMenuController,ControllerUtilities):
+
+    def dealloc():
+          self.log("Deallocing MenuController %s" % self.title)
+          return BRMediaMenuController.dealloc(self)
 
     def initWithMenu_(self, menu):
           BRMenuController.init(self)

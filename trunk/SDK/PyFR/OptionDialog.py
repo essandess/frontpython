@@ -16,23 +16,29 @@ class OptionItem(object):
         self.data = userdata
 
 class OptionDialog(BROptionDialog):
-    def initWithTitle_Items_Handler_(self, title, items):
+
+    # You can either pass in a handler function to be called, or override handler in your subclassclass
+    def initWithTitle_Items_Handler_(self, title, items, handler=None):
         BROptionDialog.init(self)
         self.items = items
         self.setTitle_(title)
         for i in self.items:
             self.addOptionText_(i.text)
         self.setActionSelector_target_("response:", self)
+        self.handler_func=handler
+        if handler is not None:
+            self.handler_func=handler
         return self
 
     def response_(self):
-        if self.handler(self.selectedIndex(), self.items[ self.selectedIndex() ]):
+        if self.handler_func(self, self.selectedIndex(), self.items[ self.selectedIndex() ]):
             self.stack().popController()
 
-    def handler(self, index, item):
+    def handler(self, controller, index, item):
         # this should be overridden in the users class
         alert = BRAlertController.alertOfType_titled_primaryText_secondaryText_( 0, "Option response:", "Option #%s" % str(index), "Userdata: %s" % item.data)
         self.stack().pushController_(alert)
+        return True
 
 
 # 

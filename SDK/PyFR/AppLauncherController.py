@@ -21,5 +21,8 @@ class AppLauncherController(PyFR.WaitController.WaitController):
     def PyFR_start(self):
         self.launchApp( self.app, self.file )
 
+    def FRWasShown(self):
+        self.stack().popController()
+
 
 

@@ -54,7 +54,8 @@ class ControllerUtilities:
         # If we don't find App running, then we exited. So bring FR back.
         if not found or self.AppShouldExit():
             frController = BRAppManager.sharedApplication().delegate()
-            frController._makeScene()
+            #frController._makeScene()
+            frController._showFrontRow()
 
             # Make sure to turn off the timer!
             self.timer.invalidate()

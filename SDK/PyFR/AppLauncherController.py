@@ -12,7 +12,7 @@ import PyFR.WaitController
 
 
 class AppLauncherController(PyFR.WaitController.WaitController):
-    def initWithApp_file_(self, text, application, file):
+    def initWithApp_file_(self, text, application, file = None):
         self.app = application
         self.file = file
         PyFR.WaitController.WaitController.initWithText_( self, text )
@@ -22,7 +22,7 @@ class AppLauncherController(PyFR.WaitController.WaitController):
         self.launchApp( self.app, self.file )
 
     def FRWasShown(self):
-        self.stack().popController()
+        self.waitDone()
 
 
 

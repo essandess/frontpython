@@ -26,5 +26,3 @@ class AppLauncherController(PyFR.WaitController.WaitController):
 
 
 
-
-

@@ -37,39 +37,19 @@ class ControllerUtilities:
         return False
 
 
-    def IsRunning(self, ping=False):
+    def __IsRunning(self):
         # Check to see if App is running.
         for app in Foundation.NSWorkspace.sharedWorkspace().launchedApplications():
             if app['NSApplicationName'] == self.lookForApp:
-                
-                # Is it the active app?
-                ws = Foundation.NSWorkspace.sharedWorkspace()
-                
-                activeApp = ws.activeApplication()
-                if activeApp['NSApplicationName'] != self.lookForApp:
-
-                    # ping it, so it becomes active.
-                    # Why do we do this you ask? Well.. When we hide front row
-                    # above, it brings the last active application to the front.
-                    # Why? I don't know.
-
-                    if (ping):
-                        ws.launchApplication_( self.launchedApp )
-
-                        # I'm attempting to delay the file opening as
-                        # late as possible, since FR likes to cover everything.
-                        #if not self.fileOpened and self.fileToLoad is not None:
-                        #    self.fileOpened = True
-                        #    app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
-                        #    app.open_( self.fileToLoad )
-
                 return True
 
         return False
 
     def launchedAppTick_(self, senders):
+        # timer method to see if the app we launched is still running.
+        # If not, exit back to FR.
 
-        found=self.IsRunning(True)
+        found=self.__IsRunning()
 
         # If we don't find App running, then we exited. So bring FR back.
         if not found or self.AppShouldExit():
@@ -81,9 +61,6 @@ class ControllerUtilities:
 
             self.FRWasShown()
 
-
-
-
     def launchApp(self, appToLaunch, fileToLoad=None):
         """ launches the application specified by appToLaunch.
     
@@ -93,15 +70,14 @@ class ControllerUtilities:
         """
     
         self.launchedApp = appToLaunch
-        self.fileToLoad = fileToLoad
         self.lookForApp = self.launchedApp.split('/')[-1][:-4]
 
-
+        # Launch the app
         ws = Foundation.NSWorkspace.sharedWorkspace()
         ws.launchApplication_( self.launchedApp )
 
         # possibly Load App
-        while not self.IsRunning():
+        while not self.__IsRunning():
     
             # I probably shouldn't use a sleep here, as thats not good GUI 
             # practice. But it works. Not like its going to be around long in 
@@ -111,15 +87,18 @@ class ControllerUtilities:
         # Start hiding the display
         frController = BRAppManager.sharedApplication().delegate()
         # We use continue, since it seems to skip the -slow- fade out.
+        # It also doesn't seem to kill the controller stack!
         frController._continueDestroyScene_(None)
 
-        self.fileOpened = False
-        if not self.fileOpened and self.fileToLoad is not None:
-            self.fileOpened = True
+        # Ping the app to the front
+        ws.launchApplication_( self.launchedApp )
+
+        # Tell the app to load the file we want to open, if necessary.
+        if fileToLoad is not None:
             app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
-            app.open_( self.fileToLoad )
+            app.open_( fileToLoad )
 
-
+        # Well, we already hid, so we may move this. 
         self.AboutToHideFR()
     
         # Start a timer

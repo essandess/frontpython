@@ -1,4 +1,5 @@
 import time
+import os 
 
 import objc
 import Foundation
@@ -10,6 +11,14 @@ from BackRow import *
 
 class ControllerUtilities:
     """ this is a mixin with some useful utilities for other Controllers """
+    def enableObjCCapture(self):
+        objc.loadBundleFunctions(Foundation.__bundle__, globals(),[('instrumentObjcMessageSends', objc._C_VOID + objc._C_NSBOOL)])
+        instrumentObjcMessageSends(True)
+
+    def disableObjCCapture(self):
+        objc.loadBundleFunctions(Foundation.__bundle__, globals(),[('instrumentObjcMessageSends', objc._C_VOID + objc._C_NSBOOL)])
+        instrumentObjcMessageSends(False)
+
 
     # Logging.
     def log(self, s):
@@ -49,10 +58,10 @@ class ControllerUtilities:
 
                         # I'm attempting to delay the file opening as
                         # late as possible, since FR likes to cover everything.
-                        if not self.fileOpened and self.fileToLoad is not None:
-                            self.fileOpened = True
-                            app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
-                            app.open_( self.fileToLoad )
+                        #if not self.fileOpened and self.fileToLoad is not None:
+                        #    self.fileOpened = True
+                        #    app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
+                        #    app.open_( self.fileToLoad )
 
                 return True
 
@@ -65,12 +74,14 @@ class ControllerUtilities:
         # If we don't find App running, then we exited. So bring FR back.
         if not found or self.AppShouldExit():
             frController = BRAppManager.sharedApplication().delegate()
-            frController._showFrontRow()
+            frController._makeScene()
 
             # Make sure to turn off the timer!
             self.timer.invalidate()
 
             self.FRWasShown()
+
+
 
 
     def launchApp(self, appToLaunch, fileToLoad=None):
@@ -84,27 +95,39 @@ class ControllerUtilities:
         self.launchedApp = appToLaunch
         self.fileToLoad = fileToLoad
         self.lookForApp = self.launchedApp.split('/')[-1][:-4]
-    
+
+
+        ws = Foundation.NSWorkspace.sharedWorkspace()
+        ws.launchApplication_( self.launchedApp )
+
         # possibly Load App
         while not self.IsRunning():
-            ws = Foundation.NSWorkspace.sharedWorkspace()
-            ws.launchApplication_( self.launchedApp )
     
             # I probably shouldn't use a sleep here, as thats not good GUI 
             # practice. But it works. Not like its going to be around long in 
             # here.
             time.sleep(0.5)
-    
-        self.AboutToHideFR()
-    
-        # Get FR out of the way. Boy was this fun trying to figure out.
-        frController = BRAppManager.sharedApplication().delegate()
-        self.fileOpened = False
 
-        frController._hideFrontRow()
+        # Start hiding the display
+        frController = BRAppManager.sharedApplication().delegate()
+        # We use continue, since it seems to skip the -slow- fade out.
+        frController._continueDestroyScene_(None)
+
+        self.fileOpened = False
+        if not self.fileOpened and self.fileToLoad is not None:
+            self.fileOpened = True
+            app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
+            app.open_( self.fileToLoad )
+
+
+        self.AboutToHideFR()
     
         # Start a timer
         self.timer = Foundation.NSTimer.scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_( 0.25, self, "launchedAppTick:", None, True )
+     
+     
+
+
 
 
 

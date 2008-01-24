@@ -23,7 +23,7 @@ class FileBrowserController(DynamicMenuController):
             if f[0] == '.':
                 continue
 
-            isDir = manager.fileExistsAtPath_isDirectory_( self.directory + "/" + f )[1]
+            isDir = manager.fileExistsAtPath_isDirectory_( self.directory + "/" + f, None )[1]
 
             item = DynamicMenuItem(f, self.__clicked, f, folder=isDir )
             items.append(item)

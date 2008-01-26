@@ -24,6 +24,25 @@ class ControllerUtilities:
     def log(self, s):
         Foundation.NSLog( "%s: %s" % (self.__class__.__name__, str(s) ) )
 
+    def firedMethod_(self, senders):
+        userInfo = senders.userInfo()
+        self.log( "Firing method %s" % userInfo['method'] )
+
+        method = getattr( userInfo['object'], userInfo['method'] )
+
+        method( *userInfo['info'] )
+
+    def fireMethod( self, obj, method, *params ):
+        data = { 'object' : obj,
+                 'method' : method,
+                 'info'   : params }
+
+        # Fire a method at a later date. this allows us to 'play nice' with the event loop.
+        Foundation.NSTimer.scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_( 0.01, 
+                                                                                             self, 
+                                                                                             "firedMethod:", 
+                                                                                             data, 
+                                                                                             False )
 
     # subclass can replace this with an additional exit condition test.  If this fn returns true
     # we return to FrontRow
@@ -35,7 +54,6 @@ class ControllerUtilities:
 
     def FRWasShown(self):
         return False
-
 
     def __IsRunning(self):
         # Check to see if App is running.
@@ -54,7 +72,6 @@ class ControllerUtilities:
         # If we don't find App running, then we exited. So bring FR back.
         if not found or self.AppShouldExit():
             frController = BRAppManager.sharedApplication().delegate()
-            #frController._makeScene()
             frController._showFrontRow()
 
             # Make sure to turn off the timer!
@@ -74,8 +91,8 @@ class ControllerUtilities:
         self.lookForApp = self.launchedApp.split('/')[-1][:-4]
 
         # Launch the app
-        ws = Foundation.NSWorkspace.sharedWorkspace()
-        ws.launchApplication_( self.launchedApp )
+        app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
+        app.activate()
 
         # possibly Load App
         while not self.__IsRunning():
@@ -85,29 +102,25 @@ class ControllerUtilities:
             # here.
             time.sleep(0.5)
 
+        # Well, we already hid, so we may move this. 
+        self.AboutToHideFR()
+
         # Start hiding the display
         frController = BRAppManager.sharedApplication().delegate()
         # We use continue, since it seems to skip the -slow- fade out.
         # It also doesn't seem to kill the controller stack!
-        frController._continueDestroyScene_(None)
+        self.fireMethod( frController, "_continueDestroyScene:", None )
 
+
+        ######### Since I'm firing the destory in the event loop, this doesn't seem necessary 
+        ######### Anymore. In fact, it was messing things up. Leaving here for now, in case 
+        ######### soneone needs it
         # Ping the app to the front
-        ws.launchApplication_( self.launchedApp )
+        #ws.launchApplication_( self.launchedApp )
 
         # Tell the app to load the file we want to open, if necessary.
         if fileToLoad is not None:
-            app = SBApplication.applicationWithURL_( NSURL.alloc().initFileURLWithPath_( self.launchedApp ) )
             app.open_( fileToLoad )
 
-        # Well, we already hid, so we may move this. 
-        self.AboutToHideFR()
-    
         # Start a timer
         self.timer = Foundation.NSTimer.scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_( 0.25, self, "launchedAppTick:", None, True )
-     
-     
-
-
-
-
-

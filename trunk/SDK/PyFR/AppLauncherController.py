@@ -18,6 +18,12 @@ class AppLauncherController(PyFR.WaitController.WaitController):
         PyFR.WaitController.WaitController.initWithText_( self, text )
         return self
 
+    def initWithApp_( self, text, application ):
+        self.app = application
+        self.file = None
+        PyFR.WaitController.WaitController.initWithText_( self, text )
+        return self
+
     def PyFR_start(self):
         self.launchApp( self.app, self.file )
 

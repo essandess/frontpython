@@ -58,6 +58,7 @@ class WaitController(BRController, ControllerUtilities):
         BRController.wasPushed(self)
 
         self.PyFR_start()
+        self.removeAllControls()
 
     def PyFR_start(self):
         # This should get overridden

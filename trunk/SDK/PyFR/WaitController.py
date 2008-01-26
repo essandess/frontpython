@@ -8,6 +8,7 @@ class WaitController(BRController, ControllerUtilities):
     # correctly for some reason. Movin this to the util class will not work.
     launchedAppTick_ = objc.selector( ControllerUtilities.launchedAppTick_, 
                                       signature="v@:@")
+    firedMethod_ = objc.selector( ControllerUtilities.firedMethod_, signature="v@:@")
 
 
     def __setupText(self, text):
@@ -58,11 +59,13 @@ class WaitController(BRController, ControllerUtilities):
         BRController.wasPushed(self)
 
         self.PyFR_start()
-        self.removeAllControls()
 
     def PyFR_start(self):
         # This should get overridden
         pass
+
+    def AboutToHideFR(self):
+        self.removeAllControls() 
 
     def waitDone(self):
         self.stack().popController()

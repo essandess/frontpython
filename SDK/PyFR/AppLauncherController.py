@@ -9,7 +9,7 @@
 
 #import modules required by application
 import PyFR.WaitController
-
+import objc
 
 class AppLauncherController(PyFR.WaitController.WaitController):
     def initWithApp_file_(self, text, application, file = None):
@@ -27,8 +27,11 @@ class AppLauncherController(PyFR.WaitController.WaitController):
     def PyFR_start(self):
         self.launchApp( self.app, self.file )
 
+        # FR automatically quits after 20 minutes.  This should disable that behavior...
+        #   not tested here, you might need to do this a few seconds into your AppShouldExit callback
+        foo=objc.lookUpClass("FRAutoQuitManager")
+        foo.sharedManager().setAutoQuitEnabled_(False)
+
+
     def FRWasShown(self):
         self.waitDone()
-
-
-

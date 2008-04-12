@@ -7,11 +7,12 @@ from Utilities import ControllerUtilities
 
 # in individual menu item with text, a function to be called when activated, and an optionional argument to be passed to the function
 class MenuItem(ControllerUtilities):
-      def __init__(self,title,func,arg=None,metadata_func=None):
+      def __init__(self,title,func,arg=None,metadata_func=None, smalltext=False):
             self.title=title
             self.func=func
             self.arg=arg
             self.metadata_func=metadata_func
+            self.smalltext=smalltext
 
       def Activate(self, controller):
             #self.log("In activate for menu item %s" % self.title)
@@ -72,7 +73,10 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
                   result.setRightJustifiedText_(self.menu.items[row].GetRightText())
             else:
                   result=BRTextMenuItemLayer.menuItem()
-                  result.setTitle_(self.menu.items[row].title)
+                  if not self.menu.items[row].smalltext:
+                        result.setTitle_(self.menu.items[row].title)
+                  else:
+                        result.setTitle_withAttributes_(self.menu.items[row].title,BRThemeInfo.sharedTheme().menuItemSmallTextAttributes())
             return result
 
       def itemSelected_(self, row):

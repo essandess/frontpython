@@ -5,6 +5,7 @@ import AppKit
 from BackRow import *
 from Utilities import ControllerUtilities
 
+
 # in individual menu item with text, a function to be called when activated, and an optionional argument to be passed to the function
 class MenuItem(ControllerUtilities):
       def __init__(self,title,func,arg=None,metadata_func=None, smalltext=False):
@@ -26,16 +27,25 @@ class MenuItem(ControllerUtilities):
                   return None
             
 # simple container class for a menu, elements of the items list may contain menu items or another Menu instance for submenus
-class Menu:
-      def __init__(self,page_title,items=[]):
+class Menu(ControllerUtilities):
+      def __init__(self,page_title,items=[],metadata_func=None):
           self.page_title=page_title
           self.items=items
+          self.metadata_func=metadata_func
           
       def AddItem(self,item):
           self.items.append(item)
 
       def GetRightText(self):
             return ""
+
+      def GetMetadata(self, controller):
+            #self.log("In GetMetadata for menu %s" % self.page_title)
+            if self.metadata_func is not None:
+                  return self.metadata_func(controller, self.page_title)
+            else:
+                  return None
+
 
 # used to duck-type Menus (to indicate an item is a submenu)
 def IsMenu(a):
@@ -72,10 +82,11 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
                   result.setTitle_(self.menu.items[row].page_title)
                   result.setRightJustifiedText_(self.menu.items[row].GetRightText())
             else:
-                  result=BRTextMenuItemLayer.menuItem()
                   if not self.menu.items[row].smalltext:
+                        result=BRTextMenuItemLayer.menuItem()
                         result.setTitle_(self.menu.items[row].title)
                   else:
+                        result=BRTextMenuItemLayer.alloc().init()
                         result.setTitle_withAttributes_(self.menu.items[row].title,BRThemeInfo.sharedTheme().menuItemSmallTextAttributes())
             return result
 
@@ -88,25 +99,19 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
             else:
                   self.menu.items[row].Activate(self.ctrlr)
 
-#  should return a preview controller of some type, perhaps
-#  BRMetaDataPreviewController BRMetaDataLayer BRMetaDataControl(seems
-#  to work for now, but that is really contained in something I
-#  haven't identified yet)
+      #  return a preview controller of some type, perhaps BRMetaDataPreviewController
+      #  see PyeTV source for example!
       def previewControlForItem_(self, row):
             if row >= len(self.menu.items):
                   return None
-            if IsMenu(self.menu.items[row]):
-                  return None # fixme: could have metadata func here too!
-            else:
-                  return self.menu.items[row].GetMetadata(self.ctrlr)
-
+            return self.menu.items[row].GetMetadata(self.ctrlr)
 
       def RemoveItem(self,item):
             self.items.remove(item)
             self.refreshControllerForModelUpdate()
 
 
-    # Dont care aboutr these below.
+    # Dont care about these below.
       def heightForRow_(self,row):
             return 0.0
 

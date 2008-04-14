@@ -88,6 +88,7 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
                   else:
                         result=BRTextMenuItemLayer.alloc().init()
                         result.setTitle_withAttributes_(self.menu.items[row].title,BRThemeInfo.sharedTheme().menuItemSmallTextAttributes())
+            self.menu.items[row].layer=result
             return result
 
       def itemSelected_(self, row):

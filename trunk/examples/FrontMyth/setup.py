@@ -2,7 +2,7 @@ from distutils.core import setup
 import py2app
 
 
-plist = dict(NSPrincipalClass='RUIPythonAppliance',
+plist = dict(NSPrincipalClass='RUIFrontMyth',
              CFBundleDevelopmentRegion='English',
              CFBundleExecutable='FrontMyth',
              CFBundleName='FrontMyth',
@@ -19,7 +19,8 @@ plist = dict(NSPrincipalClass='RUIPythonAppliance',
 
 
 setup(
-    plugin = ['FrontPython.py'],
+    plugin = ['FrontMyth.py'],
+    packages = ['PyFR'],
     data_files=['English.lproj'],
     options=dict(py2app=dict(extension='.frappliance', plist=plist))
  )

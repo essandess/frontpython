@@ -22,7 +22,8 @@ class ControllerUtilities:
 
     # Logging.
     def log(self, s):
-        Foundation.NSLog( "%s: %s" % (self.__class__.__name__, str(s) ) )
+        #Foundation.NSLog( "%s: %s" % (self.__class__.__name__, str(s) ) )
+        pass
 
     def firedMethod_(self, senders):
         userInfo = senders.userInfo()

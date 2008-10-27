@@ -101,7 +101,7 @@ class ControllerUtilities:
             # I probably shouldn't use a sleep here, as thats not good GUI 
             # practice. But it works. Not like its going to be around long in 
             # here.
-            time.sleep(0.5)
+            time.sleep(0.25)
 
         # Well, we already hid, so we may move this. 
         self.AboutToHideFR()

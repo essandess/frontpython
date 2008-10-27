@@ -6,6 +6,12 @@ from BackRow import *
 from Utilities import ControllerUtilities
 
 
+import Foundation
+def log(s):
+    #Foundation.NSLog( "%s: %s" % ("PyeTV", str(s) ) )
+    pass
+
+
 # in individual menu item with text, a function to be called when activated, and an optionional argument to be passed to the function
 class MenuItem(ControllerUtilities):
       def __init__(self,title,func,arg=None,metadata_func=None, smalltext=False):
@@ -20,7 +26,7 @@ class MenuItem(ControllerUtilities):
             self.func(controller, self.arg)
 
       def GetMetadata(self, controller):
-            #self.log("In GetMetadata for menu item %s" % self.title)
+            self.log("In GetMetadata for menu item %s" % self.title.encode("ascii","replace"))
             if self.metadata_func is not None:
                   return self.metadata_func(controller, self.arg)
             else:
@@ -40,7 +46,7 @@ class Menu(ControllerUtilities):
             return ""
 
       def GetMetadata(self, controller):
-            #self.log("In GetMetadata for menu %s" % self.page_title)
+            self.log("In GetMetadata for menu  %s" % self.page_title.encode("ascii","replace"))
             if self.metadata_func is not None:
                   return self.metadata_func(controller, self.page_title)
             else:
@@ -55,6 +61,17 @@ BRMenuListItemProvider = objc.protocolNamed('BRMenuListItemProvider')
 class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
       def init(self):
             return NSObject.init(self)
+
+      def dealloc(self):
+            log("MenuDataSource dealloc called")
+            #clean up locally-allocated resources
+            for item in self.menu.items:
+                  try:
+                        log("releasing layer %s for menu item %s" % (item.layer, item))
+                        item.layer.release()
+                  except:
+                        pass
+            #return super(NSObject,self).dealloc()
 
       def initWithController_Menu_(self, ctrlr, menu):
             self.ctrlr = ctrlr
@@ -96,6 +113,7 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
                   return 
             if IsMenu(self.menu.items[row]):
                   con = MenuController.alloc().initWithMenu_(self.menu.items[row])
+                  con.autorelease()
                   self.ctrlr.stack().pushController_(con)
             else:
                   self.menu.items[row].Activate(self.ctrlr)
@@ -105,7 +123,9 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
       def previewControlForItem_(self, row):
             if row >= len(self.menu.items):
                   return None
-            return self.menu.items[row].GetMetadata(self.ctrlr)
+            log("calling GetMetadata")
+            ret=self.menu.items[row].GetMetadata(self.ctrlr)
+            return ret
 
       def RemoveItem(self,item):
             self.items.remove(item)
@@ -122,9 +142,10 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
 
 class MenuController(BRMediaMenuController,ControllerUtilities):
 
-    def dealloc():
-          self.log("Deallocing MenuController %s" % self.title)
-          return BRMediaMenuController.dealloc(self)
+    def dealloc(self):
+          self.log("Dealloc: MenuController %s (%s)" % (self.title.encode("ascii","replace"),repr(self)))
+          self.ds.release()
+          return super(BRMediaMenuController,self).dealloc()
 
     def initWithMenu_(self, menu):
           BRMenuController.init(self)

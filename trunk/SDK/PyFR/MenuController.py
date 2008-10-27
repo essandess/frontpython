@@ -68,7 +68,7 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
             for item in self.menu.items:
                   try:
                         log("releasing layer %s for menu item %s" % (item.layer, item))
-                        item.layer.release()
+                        #item.layer.release()
                   except:
                         pass
             #return super(NSObject,self).dealloc()
@@ -113,8 +113,8 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
                   return 
             if IsMenu(self.menu.items[row]):
                   con = MenuController.alloc().initWithMenu_(self.menu.items[row])
-                  con.autorelease()
                   self.ctrlr.stack().pushController_(con)
+                  #con.release()
             else:
                   self.menu.items[row].Activate(self.ctrlr)
 
@@ -144,11 +144,11 @@ class MenuController(BRMediaMenuController,ControllerUtilities):
 
     def dealloc(self):
           self.log("Dealloc: MenuController %s (%s)" % (self.title.encode("ascii","replace"),repr(self)))
-          self.ds.release()
+          #self.ds.release()
           return super(BRMediaMenuController,self).dealloc()
 
     def initWithMenu_(self, menu):
-          BRMenuController.init(self)
+          BRMediaMenuController.init(self)
           self.title= menu.page_title 
           self.addLabel_(menu.page_title)
           self.setListTitle_( menu.page_title )

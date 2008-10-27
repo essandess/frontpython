@@ -10,6 +10,12 @@ import AppKit
 
 from BackRow import *
 
+# log info to syslog
+import Foundation
+def log(s):
+    Foundation.NSLog( "%s: %s" % ("PyeTV", str(s) ) )
+    pass
+
 class OptionItem(object):
     def __init__(self, text, userdata):
         self.text = text
@@ -38,8 +44,13 @@ class OptionDialog(BROptionDialog):
         # this should be overridden in the users class
         alert = BRAlertController.alertOfType_titled_primaryText_secondaryText_( 0, "Option response:", "Option #%s" % str(index), "Userdata: %s" % item.data)
         self.stack().pushController_(alert)
+        #alret.release()
         return True
 
+    def dealloc(self):
+        log("Dealloc of OptionDialog")
+        super(BROptionDialog,self).dealloc()
+        
 
 # 
 # example of using a OptionDialog:  
@@ -52,19 +63,18 @@ class OptionDialog(BROptionDialog):
 def testOptionDialogHandler(controller,idx,userdata):
     alert = BRAlertController.alertOfType_titled_primaryText_secondaryText_( 0, "Option response:", "Option #%s" % str(idx), "Userdata: %s" % str(userdata[idx]))
     controller.stack().pushController_(alert)
-
+    #alert.release()
     # if we return true, we'll pop the controller and back up past the option dialog
     return False
 
 def testOptionDialogTest(controller,arg):
     dlg=OptionDialog.alloc().initWithTitle_Items_Handler_UserData_("Test options",["Select a1","Select b","Select c"],testOptionDialogHandler,["a","b","c"])
-    #dlg.autorelease()
-    return controller.stack().pushController_(dlg)
+    ret=controller.stack().pushController_(dlg)
+    #dlg.release()
+    return ret
 
 def testFromMain():
     menuItems = [ OptionItem( "select %d" % i, i+50 ) for i in range(0,3) ]
 
-    ret=OptionDialog.alloc().initWithTitle_Items_Handler_( "Test options",
-                                                              menuItems )
-    #ret.autorelease()
+    ret=OptionDialog.alloc().initWithTitle_Items_Handler_( "Test options", menuItems )
     return ret

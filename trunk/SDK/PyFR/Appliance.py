@@ -12,14 +12,12 @@ class Appliance( BRAppliance ):
     @classmethod
     def initialize(cls):
         name = NSString.alloc().initWithString_( u"com.apple.frontrow.appliance.frontpython" )
-        #name.autorelease()
         BRFeatureManager.sharedInstance().enableFeatureNamed_( name )
 
     @classmethod
     def className(cls):
 
         clsName = NSString.alloc().initWithString_( cls.__name__ )
-        #clsName.autorelease()
 
         backtrace = BRBacktracingException.backtrace()
         range = backtrace.rangeOfString_( "_loadApplianceInfoAtPath:" )
@@ -31,8 +29,6 @@ class Appliance( BRAppliance ):
         
         if range.location != Foundation.NSNotFound:
             clsName = NSString.alloc().initWithString_( "RUIMoviesAppliance" )
-            #clsName.autorelease()
-            
         return clsName
 
     def applianceController(self):

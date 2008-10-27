@@ -58,11 +58,13 @@ def testOptionDialogHandler(controller,idx,userdata):
 
 def testOptionDialogTest(controller,arg):
     dlg=OptionDialog.alloc().initWithTitle_Items_Handler_UserData_("Test options",["Select a1","Select b","Select c"],testOptionDialogHandler,["a","b","c"])
+    #dlg.autorelease()
     return controller.stack().pushController_(dlg)
 
 def testFromMain():
     menuItems = [ OptionItem( "select %d" % i, i+50 ) for i in range(0,3) ]
 
-    return OptionDialog.alloc().initWithTitle_Items_Handler_( "Test options",
+    ret=OptionDialog.alloc().initWithTitle_Items_Handler_( "Test options",
                                                               menuItems )
-
+    #ret.autorelease()
+    return ret

@@ -101,8 +101,9 @@ class DynamicMenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities
 class DynamicMenuController(BRMediaMenuController,ControllerUtilities):
 
     def dealloc():
-          self.log("Deallocing MenuController %s" % self.title)
-          return BRMediaMenuController.dealloc(self)
+          self.log("Deallocing DynamicMenuController %s" % self.title.encode("ascii","replace")))
+          self.ds.release()
+          return super(BRMediaMenuController,self).dealloc()
 
     def initWithMenu_(self, menu):
           BRMenuController.init(self)

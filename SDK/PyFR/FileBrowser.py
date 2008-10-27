@@ -37,8 +37,8 @@ class FileBrowserController(DynamicMenuController):
 
         if menuItem.folder:
             menuController = FileBrowserController.alloc().initWithDirectory_( selectedFile )
-            menuController.autorelease()
             self.stack().pushController_(menuController)
+            #menuController.release()
         else:
             self.fileSelected_( selectedFile )
 

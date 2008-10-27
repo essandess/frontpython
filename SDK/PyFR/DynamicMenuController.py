@@ -102,11 +102,11 @@ class DynamicMenuController(BRMediaMenuController,ControllerUtilities):
 
     def dealloc():
           self.log("Deallocing DynamicMenuController %s" % self.title.encode("ascii","replace")))
-          self.ds.release()
+          #self.ds.release()
           return super(BRMediaMenuController,self).dealloc()
 
     def initWithMenu_(self, menu):
-          BRMenuController.init(self)
+          BRMediaMenuController.init(self)
           self.title= menu.page_title 
           self.addLabel_(menu.page_title)
           self.setListTitle_( menu.page_title )

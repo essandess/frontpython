@@ -32,13 +32,12 @@ class FileBrowserController(DynamicMenuController):
         DynamicMenuController.initWithMenu_( self, DynamicMenu( self.directory, items ) )
         return self
 
-    def __clicked(self, menuItem):
+    def __clicked(self, dummyController, menuItem):
         selectedFile = self.directory + '/' + menuItem.title
 
         if menuItem.folder:
             menuController = FileBrowserController.alloc().initWithDirectory_( selectedFile )
             self.stack().pushController_(menuController)
-            #menuController.release()
         else:
             self.fileSelected_( selectedFile )
 

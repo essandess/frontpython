@@ -14,9 +14,9 @@ class DynamicMenuItem(ControllerUtilities):
             self.metadata_func=metadata_func
             self.folder = folder
 
-      def Activate(self):
+      def Activate(self, controller):
             #self.log("In activate for menu item %s" % self.title)
-            self.func(self)
+            self.func(controller, self)
 
       def GetMetadata(self, controller):
             #self.log("In GetMetadata for menu item %s" % self.title)
@@ -26,16 +26,24 @@ class DynamicMenuItem(ControllerUtilities):
                   return None
             
 # simple container class for a menu, elements of the items list may contain menu items or another Menu instance for submenus
-class DynamicMenu:
-      def __init__(self,page_title,items=[]):
+class DynamicMenu(ControllerUtilities):
+      def __init__(self,page_title,items=[],metadata_func=None):
           self.page_title=page_title
           self.items=items
+          self.metadata_func=metadata_func
           
       def AddItem(self,item):
           self.items.append(item)
 
       def GetRightText(self):
             return ""
+
+      def GetMetadata(self, controller):
+            self.log("In GetMetadata for menu  %s" % self.page_title.encode("ascii","replace"))
+            if self.metadata_func is not None:
+                  return self.metadata_func(controller, self.page_title)
+            else:
+                  return None
 
 BRMenuListItemProvider = objc.protocolNamed('BRMenuListItemProvider')
 class DynamicMenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
@@ -70,12 +78,10 @@ class DynamicMenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities
             if row >= len(self.menu.items):
                   return 
 
-            self.menu.items[row].Activate()
+            self.menu.items[row].Activate(self.ctrlr)
 
-#  should return a preview controller of some type, perhaps
-#  BRMetaDataPreviewController BRMetaDataLayer BRMetaDataControl(seems
-#  to work for now, but that is really contained in something I
-#  haven't identified yet)
+      #  return a preview controller of some type, perhaps BRMetaDataPreviewController
+      #  see PyeTV source for example!
       def previewControlForItem_(self, row):
             if row >= len(self.menu.items):
                   return None
@@ -90,7 +96,7 @@ class DynamicMenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities
             self.refreshControllerForModelUpdate()
 
 
-    # Dont care aboutr these below.
+    # Dont care about these below.
       def heightForRow_(self,row):
             return 0.0
 
@@ -99,12 +105,6 @@ class DynamicMenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities
 
 
 class DynamicMenuController(BRMediaMenuController,ControllerUtilities):
-
-    def dealloc():
-          self.log("Deallocing DynamicMenuController %s" % self.title.encode("ascii","replace")))
-          #self.ds.release()
-          return super(BRMediaMenuController,self).dealloc()
-
     def initWithMenu_(self, menu):
           BRMediaMenuController.init(self)
           self.title= menu.page_title 

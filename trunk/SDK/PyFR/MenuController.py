@@ -8,7 +8,7 @@ from Utilities import ControllerUtilities
 
 import Foundation
 def log(s):
-    #Foundation.NSLog( "%s: %s" % ("PyeTV", str(s) ) )
+    #Foundation.NSLog( "%s: %s" % ("PyFR", str(s) ) )
     pass
 
 
@@ -26,7 +26,7 @@ class MenuItem(ControllerUtilities):
             self.func(controller, self.arg)
 
       def GetMetadata(self, controller):
-            self.log("In GetMetadata for menu item %s" % self.title.encode("ascii","replace"))
+            #self.log("In GetMetadata for menu item %s" % self.title.encode("ascii","replace"))
             if self.metadata_func is not None:
                   return self.metadata_func(controller, self.arg)
             else:
@@ -61,17 +61,6 @@ BRMenuListItemProvider = objc.protocolNamed('BRMenuListItemProvider')
 class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
       def init(self):
             return NSObject.init(self)
-
-      def dealloc(self):
-            log("MenuDataSource dealloc called")
-            #clean up locally-allocated resources
-            for item in self.menu.items:
-                  try:
-                        log("releasing layer %s for menu item %s" % (item.layer, item))
-                        #item.layer.release()
-                  except:
-                        pass
-            #return super(NSObject,self).dealloc()
 
       def initWithController_Menu_(self, ctrlr, menu):
             self.ctrlr = ctrlr
@@ -139,22 +128,19 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
       def rowSelectable_(self, row):
             return True
 
-
 class MenuController(BRMediaMenuController,ControllerUtilities):
-
-    def dealloc(self):
-          self.log("Dealloc: MenuController %s (%s)" % (self.title.encode("ascii","replace"),repr(self)))
-          #self.ds.release()
-          return super(BRMediaMenuController,self).dealloc()
-
     def initWithMenu_(self, menu):
-          BRMediaMenuController.init(self)
-          self.title= menu.page_title 
-          self.addLabel_(menu.page_title)
-          self.setListTitle_( menu.page_title )
-          self.ds = MenuDataSource.alloc().initWithController_Menu_(self,menu)
-          self.list().setDatasource_(self.ds)
-          return self
+        self.log("MenuController initWithMenu")
+        BRMediaMenuController.init(self)
+        self.setMenu(menu)
+        return self
+
+    def setMenu(self, menu):
+        self.title= menu.page_title 
+        self.addLabel_(menu.page_title)
+        self.setListTitle_( menu.page_title )
+        self.ds = MenuDataSource.alloc().initWithController_Menu_(self,menu)
+        self.list().setDatasource_(self.ds)
 
     def willBePushed(self):
           #self.log("Pushing menu page %s,%s" % (self.title,self))

@@ -8,20 +8,20 @@
 
 
 #import modules required by application
-import PyFR.WaitController
+import WaitController
 import objc
 
-class AppLauncherController(PyFR.WaitController.WaitController):
+class AppLauncherController(WaitController.WaitController):
     def initWithApp_file_(self, text, application, file = None):
         self.app = application
         self.file = file
-        PyFR.WaitController.WaitController.initWithText_( self, text )
+        WaitController.WaitController.initWithText_( self, text )
         return self
 
     def initWithApp_( self, text, application ):
         self.app = application
         self.file = None
-        PyFR.WaitController.WaitController.initWithText_( self, text )
+        WaitController.WaitController.initWithText_( self, text )
         return self
 
     def PyFR_start(self):

@@ -3,18 +3,7 @@
 #
 #  Created by jchrist on 1/10/08
 
-#import modules required by application
-import objc
-import Foundation
-import AppKit
-
 from BackRow import *
-
-# log info to syslog
-import Foundation
-def log(s):
-    Foundation.NSLog( "%s: %s" % ("PyeTV", str(s) ) )
-    pass
 
 class OptionItem(object):
     def __init__(self, text, userdata):
@@ -22,7 +11,6 @@ class OptionItem(object):
         self.data = userdata
 
 class OptionDialog(BROptionDialog):
-
     # You can either pass in a handler function to be called, or override handler in your subclassclass
     def initWithTitle_Items_Handler_(self, title, items, handler=None):
         BROptionDialog.init(self)
@@ -46,11 +34,6 @@ class OptionDialog(BROptionDialog):
         self.stack().pushController_(alert)
         #alret.release()
         return True
-
-    def dealloc(self):
-        log("Dealloc of OptionDialog")
-        super(BROptionDialog,self).dealloc()
-        
 
 # 
 # example of using a OptionDialog:  

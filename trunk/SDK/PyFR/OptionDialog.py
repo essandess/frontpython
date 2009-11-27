@@ -4,6 +4,8 @@
 #  Created by jchrist on 1/10/08
 
 from BackRow import *
+import Foundation
+
 
 class OptionItem(object):
     def __init__(self, text, userdata):
@@ -13,18 +15,19 @@ class OptionItem(object):
 class OptionDialog(BROptionDialog):
     # You can either pass in a handler function to be called, or override handler in your subclassclass
     def initWithTitle_Items_Handler_(self, title, items, handler=None):
-        BROptionDialog.init(self)
+        self=super(OptionDialog,self).init()
+        if self is None:
+            return None
+        
         self.items = items
         self.setTitle_(title)
         for i in self.items:
             self.addOptionText_(i.text)
         self.setActionSelector_target_("response:", self)
         self.handler_func=handler
-        if handler is not None:
-            self.handler_func=handler
         return self
 
-    def response_(self):
+    def response_(self,sender):
         if self.handler_func(self, self.selectedIndex(), self.items[ self.selectedIndex() ]):
             self.stack().popController()
 

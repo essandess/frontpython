@@ -106,7 +106,9 @@ class DynamicMenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities
 
 class DynamicMenuController(BRMediaMenuController,ControllerUtilities):
     def initWithMenu_(self, menu):
-          BRMediaMenuController.init(self)
+          self=super(DynamicMenuController,self).init()
+          if self is None:
+                return None
           self.title= menu.page_title 
           self.addLabel_(menu.page_title)
           self.setListTitle_( menu.page_title )

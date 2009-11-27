@@ -48,7 +48,9 @@ class WaitController(BRController, ControllerUtilities):
         self.addControl_(self.spinner)
 
     def initWithText_(self, text):
-        BRController.init(self)
+        self=super(WaitController,self).init()
+        if self is None:
+            return None
         self.__setupText(text)
         self.__setupSpinner()
 

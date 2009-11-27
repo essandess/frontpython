@@ -12,16 +12,16 @@ import WaitController
 import objc
 
 class AppLauncherController(WaitController.WaitController):
-    def initWithApp_file_(self, text, application, file = None):
+    def initWithApp_file_(self, application, file):
         self.app = application
         self.file = file
-        WaitController.WaitController.initWithText_( self, text )
+        WaitController.WaitController.initWithText_( self, "Launching application" )
         return self
 
-    def initWithApp_( self, text, application ):
+    def initWithApp_( self, application ):
         self.app = application
         self.file = None
-        WaitController.WaitController.initWithText_( self, text )
+        WaitController.WaitController.initWithText_( self, "Launching application" )
         return self
 
     def PyFR_start(self):

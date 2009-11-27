@@ -59,13 +59,10 @@ def IsMenu(a):
 
 BRMenuListItemProvider = objc.protocolNamed('BRMenuListItemProvider')
 class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
-      def init(self):
-            return NSObject.init(self)
-
       def initWithController_Menu_(self, ctrlr, menu):
             self.ctrlr = ctrlr
             self.menu = menu
-            return self.init()
+            return self
       
       def itemCount(self):
             return len(self.menu.items)
@@ -131,7 +128,9 @@ class MenuDataSource(NSObject, BRMenuListItemProvider,ControllerUtilities):
 class MenuController(BRMediaMenuController,ControllerUtilities):
     def initWithMenu_(self, menu):
         self.log("MenuController initWithMenu")
-        BRMediaMenuController.init(self)
+        self=super(MenuController,self).init()
+        if self is None:
+            return None
         self.setMenu(menu)
         return self
 
@@ -145,11 +144,11 @@ class MenuController(BRMediaMenuController,ControllerUtilities):
     def willBePushed(self):
           #self.log("Pushing menu page %s,%s" % (self.title,self))
           self.list().reload()
-          return BRMenuController.willBePushed(self)
+          return super(MenuController,self).willBePushed()
 
     def willBePopped(self):
           #self.log("popping menu page %s, %s" % (self.title,self))
-          return BRMenuController.willBePopped(self)
+          return super(MenuController,self).willBePopped()
 
     def itemSelected_(self, row):
           return self.ds.itemSelected_(row)

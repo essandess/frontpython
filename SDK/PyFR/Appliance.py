@@ -5,7 +5,7 @@ from BackRow import *
 class Appliance( BRAppliance ):
     # Logging.
     def log(self,s):
-        Foundation.NSLog( "%s: %s" % (self.__class__.__name__, str(s) ) )
+        Foundation.NSLog( "%@: %@", self.__class__.__name__, str(s) ) 
 
     sanityCheck = False
 

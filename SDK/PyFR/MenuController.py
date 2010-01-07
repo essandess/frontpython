@@ -8,7 +8,7 @@ from Utilities import ControllerUtilities
 
 import Foundation
 def log(s):
-    #Foundation.NSLog( "%s: %@",  "PyFR", str(s) )
+    #Foundation.NSLog( u"%s: %@",  "PyFR", s )
     pass
 
 

@@ -22,7 +22,7 @@ class ControllerUtilities:
 
     # Logging.
     def log(self, s):
-        #Foundation.NSLog( "%@: %@", self.__class__.__name__, str(s) )
+        #Foundation.NSLog( u"%@: %@", self.__class__.__name__, s )
         pass
 
     def firedMethod_(self, senders):
